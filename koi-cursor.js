@@ -4,7 +4,6 @@
   const canvas = document.querySelector('#koiCanvas');
   const sprite = document.querySelector('#koiSprite');
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   if (!cursor || !canvas || !sprite) return;
 
   // Desynchronised canvases may enter the compositor a little earlier. The
@@ -28,9 +27,6 @@
   let lastInputAt = 0;
   let lastRipple = 0;
   let rippleTone = false;
-  // Keep the custom pointer available on fine-pointer devices. Reduced-motion
-  // mode removes autonomous movement and ripples instead of replacing the koi
-  // with the system cursor.
   const enabled = () => ready && finePointer.matches;
 
   function resize() {
@@ -77,7 +73,7 @@
     // Movement still comes only from the sampled pointer path. Once the
     // pointer rests, a small wave is blended into the final third of the tail;
     // the head and torso remain completely pinned and do not drift.
-    const idle = reducedMotion.matches ? 0 : clamp((now - lastInputAt - 90) / 260, 0, 1);
+    const idle = clamp((now - lastInputAt - 90) / 260, 0, 1);
     const phase = now * .0044;
     function edge(u, side) {
       const distance = (.965 - u) * 76;
@@ -167,7 +163,7 @@
 
     lastInputAt = now;
     cursor.classList.toggle('is-hovering', Boolean(event.target.closest('a,button')));
-    if (!reducedMotion.matches && moved && latestPose && now - lastRipple > 170) {
+    if (moved && latestPose && now - lastRipple > 170) {
       ripple(latestPose.tail.x, latestPose.tail.y);
       lastRipple = now;
     }
@@ -187,9 +183,8 @@
   window.addEventListener('blur', hide);
   window.addEventListener('resize', resize, { passive: true });
   finePointer.addEventListener('change', hide);
-  reducedMotion.addEventListener('change', hide);
   window.addEventListener('pointerdown', event => {
-    if (enabled() && !reducedMotion.matches && event.pointerType !== 'touch') {
+    if (enabled() && event.pointerType !== 'touch') {
       ripple(event.clientX, event.clientY, true);
     }
   }, { passive: true });

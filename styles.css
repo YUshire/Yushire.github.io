@@ -253,5 +253,8 @@ html.koi-active.koi-visible .koi-cursor { opacity: 1; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
-  .koi-ripple { display: none !important; }
+  /* The koi is the pointer itself, so its feedback remains functional even
+     when the rest of the page follows the reduced-motion preference. */
+  .koi-ripple { animation-duration: .58s !important; }
+  .koi-ripple.splash { animation-duration: .48s !important; }
 }
