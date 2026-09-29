@@ -253,5 +253,5 @@ html.koi-active.koi-visible .koi-cursor { opacity: 1; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
-  .koi-cursor, .koi-ripple { display: none !important; }
+  .koi-ripple { display: none !important; }
 }

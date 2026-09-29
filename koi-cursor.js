@@ -28,7 +28,10 @@
   let lastInputAt = 0;
   let lastRipple = 0;
   let rippleTone = false;
-  const enabled = () => ready && finePointer.matches && !reducedMotion.matches;
+  // Keep the custom pointer available on fine-pointer devices. Reduced-motion
+  // mode removes autonomous movement and ripples instead of replacing the koi
+  // with the system cursor.
+  const enabled = () => ready && finePointer.matches;
 
   function resize() {
     const ratio = Math.min(devicePixelRatio || 1, 2);
@@ -74,7 +77,7 @@
     // Movement still comes only from the sampled pointer path. Once the
     // pointer rests, a small wave is blended into the final third of the tail;
     // the head and torso remain completely pinned and do not drift.
-    const idle = clamp((now - lastInputAt - 90) / 260, 0, 1);
+    const idle = reducedMotion.matches ? 0 : clamp((now - lastInputAt - 90) / 260, 0, 1);
     const phase = now * .0044;
     function edge(u, side) {
       const distance = (.965 - u) * 76;
@@ -164,7 +167,7 @@
 
     lastInputAt = now;
     cursor.classList.toggle('is-hovering', Boolean(event.target.closest('a,button')));
-    if (moved && latestPose && now - lastRipple > 170) {
+    if (!reducedMotion.matches && moved && latestPose && now - lastRipple > 170) {
       ripple(latestPose.tail.x, latestPose.tail.y);
       lastRipple = now;
     }
@@ -186,7 +189,9 @@
   finePointer.addEventListener('change', hide);
   reducedMotion.addEventListener('change', hide);
   window.addEventListener('pointerdown', event => {
-    if (enabled() && event.pointerType !== 'touch') ripple(event.clientX, event.clientY, true);
+    if (enabled() && !reducedMotion.matches && event.pointerType !== 'touch') {
+      ripple(event.clientX, event.clientY, true);
+    }
   }, { passive: true });
 
   function prepare() {

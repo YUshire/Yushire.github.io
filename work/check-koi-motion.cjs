@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const KoiMotion = require('../outputs/personal-site/koi-motion.js');
+const KoiMotion = require('../koi-motion.js');
 
 function circle(direction, steps = 720, radius = 65) {
   const fish = new KoiMotion();
